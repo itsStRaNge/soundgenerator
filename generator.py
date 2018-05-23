@@ -1,9 +1,10 @@
 import numpy as np
 from scipy.io.wavfile import write
+from scipy.io.wavfile import read
 import matplotlib.pyplot as plt
 
 
-VOLUME = 15000
+VOLUME = 6000
 AUDIO_LEN = 1  # in sec
 MAX_FREQ = 22000  # in hz
 SAMPLE_FREQ = MAX_FREQ  # * 2 + 100  # in hz
@@ -43,6 +44,21 @@ def generate_note(f_root):
     return tone, signal_fft
 
 
+def generate_from_sample(file):
+    rate, signal_y = read('samples/' + file)
+    signal_y = np.int16(signal_y / np.max(np.abs(signal_y)) * VOLUME)
+
+    freq = np.fft.fft(signal_y)
+    print(freq.shape)
+    freq = np.concatenate((np.zeros(500), freq))
+    freq = freq[:(rate // 2)]  # low pass filtering
+
+    note = np.fft.ifft(freq)
+    note = np.int16(note.real / np.max(np.abs(note.real)) * VOLUME)
+    write('samples/generated.wav', len(note), note)
+    return note, freq
+
+
 def display(signal, signal_fft):
     f, axarr = plt.subplots(5)
     t = AUDIO_LEN / SAMPLES
@@ -66,6 +82,6 @@ def display(signal, signal_fft):
     axarr[2].grid()
     plt.show()
 
-signal, frequencies = generate_note(TONE)
-write('samples/generated.wav', SAMPLES, signal)
+# signal, frequencies = generate_note(TONE)
+signal, frequencies = generate_from_sample('guitar.wav')
 display(signal, frequencies)
