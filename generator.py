@@ -31,8 +31,11 @@ def generate_note(f_root):
     a = np.pi * time_line * f_root  # outside for-loop for performance
     # fill weights of overtones
     for i in range(0, num_overtones):
-        f_spec[i*f_root + f_root] = 1
-        note += np.sin(i * a)
+        try:
+            f_spec[i*f_root + f_root] = 1
+            note += np.sin(i * a)
+        except IndexError:
+            break
 
     # apply envelope for transient response
     note = note * envelope
