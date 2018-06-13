@@ -9,6 +9,8 @@ import math
 # linear interpolation
 # https://www.dsprelated.com/freebooks/pasp/Delay_Line_Interpolation.html
 
+ms = 0.001
+
 
 def my_sine(f, len, rate=44100, phase=0.0):
     length = int(len * rate)
@@ -49,15 +51,27 @@ def chorus(data, freq, dry=0.5, wet=0.5, depth=1.0, delay=25.0, rate=44100):
     return modulated_delay(data, modwave, dry, wet)
 
 
-def flanger(data, freq, dry=0.5, wet=0.5, depth=20.0, delay=1.0, rate=44100):
-    # Flanger effect
-    # http://en.wikipedia.org/wiki/Flanging
-    length = float(len(data)) / rate
-    mil = float(rate) / 1000
-    delay *= mil
-    depth *= mil
-    modwave = (my_sine(freq, length) / 2 + 0.5) * depth + delay
-    return feedback_modulated_delay(data, modwave, dry, wet)
+def flanger(data, dry=0.5, wet=0.5, delay=5, depth=2, rate=3, fs=44100):
+    """
+        delay in ms [0, 100]
+        lfo rate in Hz ([0, 50])
+        delay depth in ms (minimum of 0)
+        feedback  [0, 1]
+        dry/wet = ([0, 1])
+    """
+
+    # convert delays in ms to delay in samples
+    delay = delay * fs / 10 ** 3
+    depth = depth * fs / 10 ** 3
+
+    # get delay in samples
+    for i in range(0, len(data)):
+        try:
+            d = int(delay + depth * np.sin(rate * i/fs))
+            data[i + d] = data[i + d] * dry + data[i] * wet
+        except IndexError:
+            break
+    return data
 
 
 def tremolo(data, freq, dry=0.5, wet=0.5, rate=44100):

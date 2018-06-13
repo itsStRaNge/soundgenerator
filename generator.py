@@ -60,9 +60,9 @@ def display(tone, freq, envelope, fs):
     plt.show()
 
 data, freq, envelope, fs = generate_note(TONE)
-scaled = np.int16(data.real/np.max(np.abs(data.real)) * VOLUME)  # normalize and scale for volume
+scaled = np.int16(data.real/np.max(np.abs(data.real)) * VOLUME)  # normalize
 
+affected = effect.flanger(scaled)
 write('test.wav', fs, scaled)
-effected = effect.flanger(scaled, fs)
-sd.play(data=effected, samplerate=fs)
-display(scaled, freq, envelope, fs)
+sd.play(data=affected, samplerate=fs)
+display(affected, freq, envelope, fs)
