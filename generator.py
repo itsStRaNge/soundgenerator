@@ -1,9 +1,11 @@
 import numpy as np
 from scipy.io.wavfile import write
 from scipy.io.wavfile import read
-from scipy.fftpack import fft
+from scipy.fftpack import ifft
 from scipy.signal import hilbert
 import matplotlib.pyplot as plt
+import sounddevice as sd
+import effect
 
 
 VOLUME = 15000
@@ -17,25 +19,21 @@ def get_hilbert(file):
     return np.abs(analytic_signal)
 
 
-def generate_note(f_root):
-    # init vars
-    num_overtones = 5  # int(MAX_FREQ / TONE) - 1
+def generate_note(f_root, overtones=4):
+    # get envelope
     fs, envelope_signal = read('guitar.wav')
-
-    # init arrays
     envelope = get_hilbert(envelope_signal)
-    time_line = np.linspace(0.0, len(envelope_signal) / fs, len(envelope_signal))
-    f_spec = np.linspace(0, MAX_FREQ, MAX_FREQ)  # array with freq from main tone to max freq
-    note = np.zeros(time_line.shape)
 
-    a = np.pi * time_line * f_root  # outside for-loop for performance
-    # fill weights of overtones
-    for i in range(0, num_overtones):
+    # calculate spectrum
+    f_spec = np.zeros(MAX_FREQ)
+    for i in range(0, overtones):
         try:
-            f_spec[i*f_root + f_root] = 1
-            note += np.sin(i * a)
+            f_spec[i*f_root + f_root] = 1 / (i * i + 1)
         except IndexError:
             break
+
+    # get signal from spectrum
+    note = ifft(f_spec, len(envelope_signal))
 
     # apply envelope for transient response
     note = note * envelope
@@ -62,6 +60,9 @@ def display(tone, freq, envelope, fs):
     plt.show()
 
 data, freq, envelope, fs = generate_note(TONE)
-scaled = np.int16( data/np.max(np.abs(data)) * VOLUME)  # normalize and scale for volume
+scaled = np.int16(data.real/np.max(np.abs(data.real)) * VOLUME)  # normalize and scale for volume
+
 write('test.wav', fs, scaled)
+effected = effect.flanger(scaled, fs)
+sd.play(data=effected, samplerate=fs)
 display(scaled, freq, envelope, fs)
