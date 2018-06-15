@@ -35,8 +35,9 @@ def generate_note(f_root, overtones=4):
     # get signal from spectrum
     note = ifft(f_spec, len(envelope_signal))
 
-    # apply envelope for transient response
+    # apply envelope for transient response and normalize
     note = note * envelope
+    note = note.real / np.max(np.abs(note.real))
     return note, f_spec, envelope, fs
 
 
@@ -60,9 +61,9 @@ def display(tone, freq, envelope, fs):
     plt.show()
 
 data, freq, envelope, fs = generate_note(TONE)
-scaled = np.int16(data.real/np.max(np.abs(data.real)) * VOLUME)  # normalize
-
-affected = effect.flanger(scaled)
+data = effect.flanger(data)
+# data = effect.tremolo(data)
+scaled = np.int16(data * VOLUME)  # apply volume
 write('test.wav', fs, scaled)
-sd.play(data=affected, samplerate=fs)
-display(affected, freq, envelope, fs)
+sd.play(data=scaled, samplerate=fs)
+display(data, freq, envelope, fs)

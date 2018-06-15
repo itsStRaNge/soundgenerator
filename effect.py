@@ -51,7 +51,7 @@ def chorus(data, freq, dry=0.5, wet=0.5, depth=1.0, delay=25.0, rate=44100):
     return modulated_delay(data, modwave, dry, wet)
 
 
-def flanger(data, dry=0.5, wet=0.5, delay=5, depth=2, rate=3, fs=44100):
+def flanger(data, dry=0.5, wet=0.5, delay=20, depth=20, rate=.3, fs=44100):
     """
         delay in ms [0, 100]
         lfo rate in Hz ([0, 50])
@@ -64,20 +64,22 @@ def flanger(data, dry=0.5, wet=0.5, delay=5, depth=2, rate=3, fs=44100):
     delay = delay * fs / 10 ** 3
     depth = depth * fs / 10 ** 3
 
-    # get delay in samples
+    # apply flanger effect
+    output = np.zeros(data.shape)
+    a = 2 * np.pi * rate
     for i in range(0, len(data)):
         try:
-            d = int(delay + depth * np.sin(rate * i/fs))
-            data[i + d] = data[i + d] * dry + data[i] * wet
+            d = int(delay + depth * np.sin(a * i/fs))
+            output[i + d] = data[i + d] * dry + data[i] * wet
         except IndexError:
             break
-    return data
+    return output
 
 
-def tremolo(data, freq, dry=0.5, wet=0.5, rate=44100):
-    # Tremolo effect
-    # http://en.wikipedia.org/wiki/Tremolo
-
-    length = float(len(data)) / rate
-    modwave = (my_sine(freq, length) / 2 + 0.5)
+def tremolo(data, dry=0.5, wet=0.5, rate=2.0, fs=44100):
+    """
+        rate [0.0, 20.0]
+    """
+    t = np.linspace(0, len(data) / fs, len(data))
+    modwave = np.sin(2 * np.pi * rate * t) / 2 + 0.5
     return (data * dry) + ((data * modwave) * wet)
