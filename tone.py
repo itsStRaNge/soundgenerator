@@ -16,7 +16,7 @@ def get_instruments():
     return instruments
 
 
-def generate_note(f_root, instrument, overtones=4, fs=22000):
+def generate(f_root, instrument, overtones=4, fs=22000):
     """
     :param f_root: root frequency of the note in Hz
     :param instrument: instrument that gets imitate, call get_instruments() to check available ones
