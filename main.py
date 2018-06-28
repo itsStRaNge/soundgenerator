@@ -19,8 +19,8 @@ chosen_instrument = instrument_list[0]
 signal, freq, envelope = tone.generate(TONE, chosen_instrument)
 
 # apply effects
-# signal = effect.flanger(signal)
-signal = effect.tremolo(signal)
+signal = effect.flanger(signal)
+# signal = effect.tremolo(signal)
 
 # set volume
 scaled = np.int16(signal * VOLUME)  # apply volume

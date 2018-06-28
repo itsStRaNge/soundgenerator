@@ -28,8 +28,10 @@ def flanger(data, dry=0.5, wet=0.5, delay=20, depth=20, rate=.3, fs=44100):
     a = 2 * np.pi * rate
     for i in range(0, len(data)):
         try:
-            d = int(delay + depth * np.sin(a * i/fs))
-            output[i + d] = data[i + d] * dry + data[i] * wet
+            d = i - int(delay + depth * np.sin(a * i/fs))
+            if d < 0:
+                d = i
+            output[i] = data[d] * dry + data[i] * wet
         except IndexError:
             break
     return output
