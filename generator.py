@@ -8,7 +8,7 @@ import tone
 VOLUME = 15000
 MAX_FREQ = 22000  # in hz
 TONE = 880  # in hz
-SYNTETHIC_DIR = 'synthetics/'
+SYNTHETIC_DIR = 'synthetics/'
 
 
 def display(tone, freq, envelope, fs):
