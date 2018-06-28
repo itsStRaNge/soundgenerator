@@ -1,6 +1,21 @@
 import numpy as np
 
 
+def reverb(data, g=0.5, m=10, fs=44100):
+    # convert m from ms to samples
+    m = int(m * fs / 10 ** 3)
+
+    y = np.zeros(data.shape)
+
+    for i in range(0, len(data)):
+        if i-m < 0:
+            y[i] = data[i]
+        else:
+            y[i] = -g * data[i] + data[i-m] + g * y[i-m]
+
+    return y
+
+
 def distortion(data, gain=75, dry=0.5, wet=0.5):
     """
         gain [0, inf] | don't know upper bound yet, but something around 200 seems good
@@ -30,14 +45,14 @@ def flanger(data, dry=0.5, wet=0.5, delay=20, depth=20, rate=.3, fs=44100):
     depth = depth * fs / 10 ** 3
 
     # apply flanger effect
-    output = np.zeros(data.shape)
+    y = np.zeros(data.shape)
     a = 2 * np.pi * rate / fs
     for i in range(0, len(data)):
         d = i - int(delay + depth * np.sin(a * i))
         if d < 0:
             d = i
-        output[i] = data[i] * dry + data[d] * wet
-    return output
+        y[i] = data[i] * dry + data[d] * wet
+    return y
 
 
 def tremolo(data, dry=0.5, wet=0.5, rate=2.0, fs=44100):

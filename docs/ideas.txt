@@ -17,9 +17,15 @@
 # https://www.dsprelated.com/freebooks/pasp/Flanging.html
 # linear interpolation
 # https://www.dsprelated.com/freebooks/pasp/Delay_Line_Interpolation.html
+
+http://www.music.mcgill.ca/~ich/classes/dafx_book.pdf
+
     - chorus
     - distortion
         DAFX book page 125, careful there is a sign error in the formular
-        http://www.music.mcgill.ca/~ich/classes/dafx_book.pdf
-    - hall
-    -
+    - reverb
+        DAFX book page 177
+
+
+- real time input processing
+    https://stackoverflow.com/questions/35344649/reading-input-sound-signal-using-python
