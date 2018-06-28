@@ -1,10 +1,25 @@
-Phase Correlation Meter
-(https://github.com/michaelting/Phase_Correlation/blob/master/phase_corr.py)
-def phase_correlation(a, b):
-    G_a = np.fft.fft2(a)
-    G_b = np.fft.fft2(b)
-    conj_b = np.ma.conjugate(G_b)
-    R = G_a*conj_b
-    R /= np.absolute(R)
-    r = np.fft.ifft2(R).real
-    return r
+- Phase Correlation Meter
+    (https://github.com/michaelting/Phase_Correlation/blob/master/phase_corr.py)
+    def phase_correlation(a, b):
+        G_a = np.fft.fft2(a)
+        G_b = np.fft.fft2(b)
+        conj_b = np.ma.conjugate(G_b)
+        R = G_a*conj_b
+        R /= np.absolute(R)
+        r = np.fft.ifft2(R).real
+        return r
+
+- More audio effects
+# inspiration
+# https://github.com/wybiral/python-musical
+# delay http://andrewslotnick.com/posts/audio-delay-with-python.html
+
+# https://www.dsprelated.com/freebooks/pasp/Flanging.html
+# linear interpolation
+# https://www.dsprelated.com/freebooks/pasp/Delay_Line_Interpolation.html
+    - chorus
+    - distortion
+        DAFX book page 125, careful there is a sign error in the formular
+        http://www.music.mcgill.ca/~ich/classes/dafx_book.pdf
+    - hall
+    -

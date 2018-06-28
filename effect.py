@@ -1,13 +1,19 @@
 import numpy as np
-import math
 
-# inspiration
-# https://github.com/wybiral/python-musical
-# delay http://andrewslotnick.com/posts/audio-delay-with-python.html
 
-# https://www.dsprelated.com/freebooks/pasp/Flanging.html
-# linear interpolation
-# https://www.dsprelated.com/freebooks/pasp/Delay_Line_Interpolation.html
+def distortion(data, gain=75, dry=0.5, wet=0.5):
+    """
+        gain [0, inf] | don't know upper bound yet, but something around 200 seems good
+    """
+    abs_data = np.abs(data)
+    max_data = np.max(abs_data)
+
+    q = data * gain / max_data
+    v = np.multiply(np.sign(-q), q)
+    p = 1 - np.exp(v)
+    z = np.multiply(np.sign(-q), p)
+    y = dry * data + wet * z * max_data / np.max(np.abs(z))
+    return y * max_data / np.max(np.abs(y))
 
 
 def flanger(data, dry=0.5, wet=0.5, delay=20, depth=20, rate=.3, fs=44100):
