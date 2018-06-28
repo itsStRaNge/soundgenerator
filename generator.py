@@ -1,44 +1,14 @@
 import numpy as np
 from scipy.io.wavfile import write
-from scipy.io.wavfile import read
-from scipy.fftpack import ifft
-from scipy.signal import hilbert
 import matplotlib.pyplot as plt
 import sounddevice as sd
 import effect
-
+import tone
 
 VOLUME = 15000
 MAX_FREQ = 22000  # in hz
-SAMPLE_FREQ = MAX_FREQ  #* 2 + 100  # in hz
-TONE = 440  # in hz
-
-
-def get_hilbert(file):
-    analytic_signal = hilbert(file)
-    return np.abs(analytic_signal)
-
-
-def generate_note(f_root, overtones=4):
-    # get envelope
-    fs, envelope_signal = read('guitar.wav')
-    envelope = get_hilbert(envelope_signal)
-
-    # calculate spectrum
-    f_spec = np.zeros(MAX_FREQ)
-    for i in range(0, overtones):
-        try:
-            f_spec[i*f_root + f_root] = 1 / (i * i + 1)
-        except IndexError:
-            break
-
-    # get signal from spectrum
-    note = ifft(f_spec, len(envelope_signal))
-
-    # apply envelope for transient response and normalize
-    note = note * envelope
-    note = note.real / np.max(np.abs(note.real))
-    return note, f_spec, envelope, fs
+TONE = 880  # in hz
+SYNTETHIC_DIR = 'synthetics/'
 
 
 def display(tone, freq, envelope, fs):
@@ -60,10 +30,23 @@ def display(tone, freq, envelope, fs):
     axarr[2].grid()
     plt.show()
 
-data, freq, envelope, fs = generate_note(TONE)
-data = effect.flanger(data)
-# data = effect.tremolo(data)
-scaled = np.int16(data * VOLUME)  # apply volume
-write('test.wav', fs, scaled)
-sd.play(data=scaled, samplerate=fs)
-display(data, freq, envelope, fs)
+
+if __name__ == '__main__':
+    # TODO: use a chooser to select instrument
+    instrument_list = tone.get_instruments()
+    choosen_instrument = instrument_list[0]
+
+    # generate tone
+    signal, freq, envelope = tone.generate_note(TONE, choosen_instrument)
+
+    # apply effects
+    # signal = effect.flanger(signal)
+    # signal = effect.tremolo(signal)
+
+    # set volume
+    scaled = np.int16(signal * VOLUME)  # apply volume
+
+    # save and display result
+    write(SYNTETHIC_DIR + choosen_instrument, 44100, scaled)
+    sd.play(data=scaled, samplerate=44100)
+    display(signal, freq, envelope, 44100)
