@@ -25,15 +25,12 @@ def flanger(data, dry=0.5, wet=0.5, delay=20, depth=20, rate=.3, fs=44100):
 
     # apply flanger effect
     output = np.zeros(data.shape)
-    a = 2 * np.pi * rate
+    a = 2 * np.pi * rate / fs
     for i in range(0, len(data)):
-        try:
-            d = i - int(delay + depth * np.sin(a * i/fs))
-            if d < 0:
-                d = i
-            output[i] = data[d] * dry + data[i] * wet
-        except IndexError:
-            break
+        d = i - int(delay + depth * np.sin(a * i))
+        if d < 0:
+            d = i
+        output[i] = data[i] * dry + data[d] * wet
     return output
 
 
@@ -43,4 +40,4 @@ def tremolo(data, dry=0.5, wet=0.5, rate=2.0, fs=44100):
     """
     t = np.linspace(0, len(data) / fs, len(data))
     modwave = np.sin(2 * np.pi * rate * t) / 2 + 0.5
-    return (data * dry) + ((data * modwave) * wet)
+    return data * dry + (data * modwave) * wet
