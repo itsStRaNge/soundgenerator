@@ -31,7 +31,7 @@ def distortion(data, gain=75, dry=0.5, wet=0.5):
     return y * max_data / np.max(np.abs(y))
 
 
-def flanger(data, dry=0.5, wet=0.5, delay=20, depth=20, rate=.3, fs=44100):
+def flanger(data, dry=0.5, wet=0.5, delay=5, depth=20, rate=.3, fs=44100):
     """
         delay in ms [0, 100]
         lfo rate in Hz ([0, 50])
@@ -53,6 +53,20 @@ def flanger(data, dry=0.5, wet=0.5, delay=20, depth=20, rate=.3, fs=44100):
             d = i
         y[i] = data[i] * dry + data[d] * wet
     return y
+
+
+def chorus(data, dry=0.5, wet=0.5, delay=15, fs=44100):
+    """
+        delay [10, 30]
+    """
+    # convert delays in ms to delay in samples
+    delay = int(delay * fs / (10 ** 3))
+    for i in range(0, len(data)):
+        d = i - delay
+        if d > 0:
+            data[i] = dry * data[i] + wet * data[d]
+
+    return data
 
 
 def tremolo(data, dry=0.5, wet=0.5, rate=2.0, fs=44100):

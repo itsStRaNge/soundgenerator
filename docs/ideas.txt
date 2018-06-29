@@ -21,9 +21,9 @@
 http://www.music.mcgill.ca/~ich/classes/dafx_book.pdf
 
     - chorus
-    - distortion
+    - distortion (check)
         DAFX book page 125, careful there is a sign error in the formular
-    - reverb
+    - reverb (working on)
         DAFX book page 177
 
 
