@@ -16,14 +16,15 @@ instrument_list = tone.get_instruments()
 chosen_instrument = instrument_list[0]
 
 # generate tone
-signal, freq, envelope = tone.generate(TONE, chosen_instrument)
+# signal, freq, envelope = tone.generate(TONE, chosen_instrument)
+signal, freq, envelope = tone.generate_power_chord(TONE, chosen_instrument)
 
 # apply effects
 # signal = effect.flanger(signal)
 # signal = effect.tremolo(signal)
 # signal = effect.distortion(signal)
 # signal = effect.reverb(signal)
-signal = effect.chorus(signal, wet=0.5, delay=15)
+# signal = effect.chorus(signal, wet=0.5, delay=15)
 
 # set volume
 scaled = np.int16(signal * VOLUME)  # apply volume

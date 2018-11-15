@@ -38,6 +38,32 @@ def generate(f_root, instrument, overtones=4, fs=22000):
     note = note.real / np.max(np.abs(note.real))
     return note, f_spec, envelope
 
+def generate_power_chord(f_root, instrument, overtones=4, fs=22000):
+    """
+    :param f_root: root frequency of the note in Hz
+    :param instrument: instrument that gets imitate, call get_instruments() to check available ones
+    :param overtones: number of overtones used
+    :param fs: max number of frequencies used to generate tone
+    :return: tone as signal, as spectrum, as envelope
+    """
+    # get envelope
+    envelope = _get_envelope(instrument)
+
+    # calculate note
+    f_fifth = f_root * 3 / 2
+
+    # calculate spectrum
+    f_spec = _get_spectrum(f_root, overtones, fs)
+    f_spec += _get_spectrum(f_fifth, overtones, fs)
+
+    # get signal from spectrum
+    note = ifft(f_spec, len(envelope))
+
+    # apply envelope for transient response and normalize
+    note = note * envelope
+    note = note.real / np.max(np.abs(note.real))
+    return note, f_spec, envelope
+
 
 def _get_envelope(file):
     fs_sample, envelope_signal = read(SAMPLE_DIR + file)
